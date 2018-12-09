@@ -19,9 +19,9 @@ class Non_stationary_BSP:
                                             # I[i] gives the inventory of product that has been in the inventory for i days.
     waste = []                              # The number of products wasted for each day.
     short = []                              # The number of products short for each day.
-    avg_mu = 2.2211538461538463             # The average demand available in the data
+    avg_mu = 2.2211538461538463             # The average demand available in the data this is used to speed up the warming period.
     
-    # The initialisation function leaves the BSP in the state it would be at the beginning of the day.
+    # The initialisation function leaves the BSP in the state it would be at the beginning of the day. This means that it requires the demand of that day as input.
     def __init__(self, D_in, m_in=None, z_in=2, cw_in=100, cs_in=500, t_in=1, Q_in=[], mu_hist_in = [], sigma_hist_in = [], I_in=[0]*5, waste_in = [], short_in = [], avg_mu_in = 2.2211538461538463):
         self.D = [D_in]
         self.m = m_in
@@ -58,7 +58,7 @@ class Non_stationary_BSP:
     # for the today and tomorrow.
     def mv_avg_predict(self):
         if self.t==1:
-            self.mu = self.avg_mu
+            self.mu = 2*self.avg_mu
         elif self.t<15:
             self.mu = self.D[self.t-2]
         else:
@@ -74,11 +74,8 @@ class Non_stationary_BSP:
         if self.t < 3:
             self.sigma = 0
         else:
-            D = numpy.array([self.D[i] + self.D[i+1] for i in range(len(self.D[:self.t-2]))])
-            mu_avg = numpy.mean(self.mu_hist)
-            diff = D - mu_avg
-#             print(diff.dot(diff))
-            self.sigma = numpy.sqrt(diff.dot(diff)/(self.t-2))
+            D = numpy.array([self.D[i] + self.D[i+1] for i in range(len(self.D[:self.t-2]))]) - numpy.array(self.mu_hist[2:])
+            self.sigma = numpy.sqrt(D.dot(D)/(self.t-2))
     
     def process_demand(self):
         demand = self.D[-1]
