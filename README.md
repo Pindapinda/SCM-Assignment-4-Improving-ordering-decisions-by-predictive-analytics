@@ -1,1 +1,1 @@
-Assignment 4
+The ideal way to validate the model is to simply clone this repository. Put the validation excel file in the Data folder and name it "Data2018.xlsx" and run all the notebooks specified in the accompanying report.
